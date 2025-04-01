@@ -1,12 +1,15 @@
 package data;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import model.Book;
+import model.User;
 
 public class BookDataManager {
     private static BookDataManager instance;
     private ArrayList<Book> bookList = new ArrayList<>();
+    private static OracleDBConnection dbManager = new OracleDBConnection();
    
 
     public static BookDataManager getInstance() {
@@ -17,7 +20,20 @@ public class BookDataManager {
     }
 
     public ArrayList<Book> getBooks() {
-        return bookList;
+    	 if (bookList.isEmpty()) {
+         	getBooksFromDatabase();  // Load from database if list is empty
+         }
+         return bookList;
+    }
+    
+    private void getBooksFromDatabase() {
+        try {
+            ArrayList<Book> booksFromDb = dbManager.fetchBooks();
+            bookList.clear();
+            bookList.addAll(booksFromDb);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
 
